@@ -122,18 +122,20 @@ def process_row_strelka(row):
 	return new_rowglobal
 
 def process_row_haplotype(row):
-	print(row)
-	# Create a dictionary to store the values for the new row
-	col = []; val = []
-	for i in row['Otherinfo.10']:
-		[x,y] = i.split('=')
-		col.append(x); val.append(y)
-	new_row = dict(zip(col, val))
-	row_dict = row.to_dict()
+    print(row['Otherinfo11'])
+    # Create a dictionary to store the values for the new row
+    col = []; val = []
 
-	new_rowglobal = {}
-	new_rowglobal.update(new_row); new_rowglobal.update(row_dict)
-	return new_rowglobal
+    for i in row['Otherinfo11']:
+        print(i)
+        [x,y] = i.split('=')
+        col.append(x); val.append(y)
+    new_row = dict(zip(col, val))
+    row_dict = row.to_dict()
+
+    new_rowglobal = {}
+    new_rowglobal.update(new_row); new_rowglobal.update(row_dict)
+    return new_rowglobal
 
 # Define a custom function to convert values to float
 def convert_to_float(x):
@@ -170,7 +172,7 @@ def extract_strand(df, caller):
 		df_bd['Rmut'] = df_bd['Rmut'].astype(float)
 
 	elif caller == 'haplotype':
-		df[['Otherinfo.10']] = df[['Otherinfo.10']].apply(lambda x: x.str.split(';'))
+		df[['Otherinfo11']] = df[['Otherinfo11']].apply(lambda x: x.str.split(';'))
 		# Create a pool of workers
 		pool = Pool(cpu_count())
 		results = pool.map(process_row_haplotype, [row for _, row in df.iterrows()])
@@ -241,7 +243,6 @@ if caller == 'strelka':
 elif caller == 'haplotype':
 	df_haplotype = read_annot_txt(input_caller); print(df_haplotype)
 	df_haplotype_filtered = filtered_df(df_haplotype, 'haplotype', output, out_ID)
-	print(df_haplotype[['Otherinfo.10', 'Otherinfo.11', 'Otherinfo.12']])
 elif caller == 'varscan':
 	df_varscan = read_annot_txt(input_caller); print(df_varscan)
 	df_varscan_filtered = filtered_df(df_varscan, 'varscan', output, out_ID)
